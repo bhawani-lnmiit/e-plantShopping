@@ -9,10 +9,13 @@ const CartItem = ({ item }) => {
     dispatch(removeItem({ id: item.id }));
   };
 
-  const handleQuantityChange = (e) => {
-    const quantity = parseInt(e.target.value, 10);
-    if (quantity > 0) {
-      dispatch(updateQuantity({ id: item.id, quantity }));
+  const handleIncrement = () => {
+    dispatch(updateQuantity({ id: item.id, quantity: item.quantity + 1 }));
+  };
+
+  const handleDecrement = () => {
+    if (item.quantity > 1) {
+      dispatch(updateQuantity({ id: item.id, quantity: item.quantity - 1 }));
     }
   };
 
@@ -20,15 +23,11 @@ const CartItem = ({ item }) => {
     <div className="cart-item">
       <h2>{item.name}</h2>
       <p>Price: ₹{item.price}</p>
-      <label>
-        Quantity: 
-        <input
-          type="number"
-          value={item.quantity}
-          onChange={handleQuantityChange}
-          min="1"
-        />
-      </label>
+      <div className="quantity-controls">
+        <button onClick={handleDecrement}>-</button>
+        <input type="number" value={item.quantity} readOnly />
+        <button onClick={handleIncrement}>+</button>
+      </div>
       <button onClick={handleRemove}>Remove</button>
       <p>Total: ₹{item.price * item.quantity}</p>
     </div>
