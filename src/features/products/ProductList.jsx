@@ -1,72 +1,77 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { addItem } from "../features/cart/CartSlice";
-
-// Sample plant data with categories
-const productsData = [
-  {
-    category: "Indoor Plants",
-    items: [
-      { id: 1, name: "Aloe Vera", price: 250, image: "/images/aloe.jpg" },
-      { id: 2, name: "Snake Plant", price: 300, image: "/images/snake.jpg" },
-      { id: 3, name: "Peace Lily", price: 400, image: "/images/peace.jpg" },
-      { id: 4, name: "Spider Plant", price: 350, image: "/images/spider.jpg" },
-      { id: 5, name: "Rubber Plant", price: 450, image: "/images/rubber.jpg" },
-      { id: 6, name: "Fiddle Leaf", price: 500, image: "/images/fiddle.jpg" },
-    ],
-  },
-  {
-    category: "Outdoor Plants",
-    items: [
-      { id: 7, name: "Rose", price: 200, image: "/images/rose.jpg" },
-      { id: 8, name: "Tulip", price: 180, image: "/images/tulip.jpg" },
-      { id: 9, name: "Marigold", price: 150, image: "/images/marigold.jpg" },
-      { id: 10, name: "Hibiscus", price: 220, image: "/images/hibiscus.jpg" },
-      { id: 11, name: "Lavender", price: 300, image: "/images/lavender.jpg" },
-      { id: 12, name: "Sunflower", price: 250, image: "/images/sunflower.jpg" },
-    ],
-  },
-];
+import "./ProductList.css";
 
 const ProductList = () => {
   const dispatch = useDispatch();
-  const [selectedCategory, setSelectedCategory] = useState(productsData[0].category);
 
-  const handleAddToCart = (product) => {
-    dispatch(addItem({ ...product, quantity: 1 }));
-    alert(`${product.name} added to cart!`);
+  // Get cart items from Redux store
+  const cartItems = useSelector((state) => state.cart.items);
+
+  // Helper to check if product already exists in cart
+  const isInCart = (id) => {
+    return cartItems.some((item) => item.id === id);
   };
 
-  const category = productsData.find(cat => cat.category === selectedCategory);
+  // Product data grouped by category
+  const categories = [
+    {
+      name: "Indoor Plants",
+      products: [
+        { id: 1, name: "Snake Plant", price: 299, image: "/images/snake.jpg" },
+        { id: 2, name: "Peace Lily", price: 349, image: "/images/lily.jpg" },
+        { id: 3, name: "Spider Plant", price: 199, image: "/images/spider.jpg" },
+        { id: 4, name: "Aloe Vera", price: 249, image: "/images/aloe.jpg" },
+        { id: 5, name: "Money Plant", price: 179, image: "/images/money.jpg" },
+        { id: 6, name: "ZZ Plant", price: 399, image: "/images/zz.jpg" }
+      ]
+    },
+    {
+      name: "Outdoor Plants",
+      products: [
+        { id: 7, name: "Rose Plant", price: 299, image: "/images/rose.jpg" },
+        { id: 8, name: "Jasmine", price: 259, image: "/images/jasmine.jpg" },
+        { id: 9, name: "Hibiscus", price: 279, image: "/images/hibiscus.jpg" },
+        { id: 10, name: "Bougainvillea", price: 319, image: "/images/bougainvillea.jpg" },
+        { id: 11, name: "Tulsi", price: 149, image: "/images/tulsi.jpg" },
+        { id: 12, name: "Lavender", price: 349, image: "/images/lavender.jpg" }
+      ]
+    }
+  ];
 
   return (
-    <div className="product-list">
-      <h1>Plant Shop Products</h1>
+    <div className="product-list-container">
+      <h1 className="page-title">Our Plants Collection</h1>
 
-      {/* Navigation Tabs */}
-      <div className="category-tabs">
-        {productsData.map(cat => (
-          <button
-            key={cat.category}
-            className={selectedCategory === cat.category ? "active" : ""}
-            onClick={() => setSelectedCategory(cat.category)}
-          >
-            {cat.category}
-          </button>
-        ))}
-      </div>
+      {categories.map((category) => (
+        <div key={category.name} className="category-section">
+          <h2 className="category-title">{category.name}</h2>
 
-      {/* Products Grid */}
-      <div className="products-grid">
-        {category.items.map(product => (
-          <div key={product.id} className="product-card">
-            <img src={product.image} alt={product.name} />
-            <h3>{product.name}</h3>
-            <p>Price: ₹{product.price}</p>
-            <button onClick={() => handleAddToCart(product)}>Add to Cart</button>
+          <div className="product-grid">
+            {category.products.map((plant) => (
+              <div key={plant.id} className="plant-card">
+                <img
+                  src={plant.image}
+                  alt={plant.name}
+                  className="plant-image"
+                />
+
+                <h3>{plant.name}</h3>
+                <p className="price">₹{plant.price}</p>
+
+                <button
+                  className="add-to-cart-btn"
+                  onClick={() => dispatch(addItem(plant))}
+                  disabled={isInCart(plant.id)}
+                >
+                  {isInCart(plant.id) ? "Added to Cart" : "Add to Cart"}
+                </button>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
   );
 };
